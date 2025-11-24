@@ -1,0 +1,21 @@
+body {
+    background: #f5f7fa;
+}
+
+.card {
+    border-radius: 20px !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border: none;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+input.form-control {
+    border-radius: 12px;
+    padding: 12px;
+}

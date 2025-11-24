@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Categories - Expense Tracker</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: "Inter", sans-serif;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #fff;
+            padding-top: 30px;
+            position: fixed;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 25px;
+            color: #444;
+            font-size: 15px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover,
+        .active-link {
+            background: #eef2ff;
+            color: #4f46e5 !important;
+            border-radius: 8px;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .color-box {
+            width: 22px;
+            height: 22px;
+            border-radius: 5px;
+            display: inline-block;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h4 class="text-center fw-bold mb-4">Expense Tracker</h4>
+
+        <a href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="expenses.html"><i class="bi bi-cash-stack me-2"></i> Expenses</a>
+        <a href="categories.html" class="active-link"><i class="bi bi-tags me-2"></i> Categories</a>
+        <a href="budget.html"><i class="bi bi-wallet2 me-2"></i> Budget</a>
+        <a href="analytics.html"><i class="bi bi-bar-chart-line me-2"></i> Analytics</a>
+
+        <hr />
+        <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <div class="d-flex justify-content-between mb-4">
+            <h2 class="fw-bold">Categories</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="bi bi-plus-circle me-1"></i> Add Category
+            </button>
+        </div>
+
+        <!-- CATEGORY TABLE -->
+        <div class="card p-3 shadow-sm">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Color</th>
+                        <th width="160px">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="categoryTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ADD CATEGORY MODAL -->
+    <div class="modal fade" id="addCategoryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Category</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <label>Name</label>
+                    <input id="catName" type="text" class="form-control mb-2" />
+
+                    <label>Color</label>
+                    <input id="catColor" type="color" class="form-control form-control-color" value="#4f46e5" />
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="addCategory()">Save</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT CATEGORY MODAL -->
+    <div class="modal fade" id="editCategoryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Category</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editCatId" />
+
+                    <label>Name</label>
+                    <input id="editCatName" type="text" class="form-control mb-2" />
+
+                    <label>Color</label>
+                    <input id="editCatColor" type="color" class="form-control form-control-color" />
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="updateCategory()">Save Changes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOTSTRAP JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- PAGE LOGIC -->
+    <script>
+        const token = localStorage.getItem("access_token");
+        if (!token) window.location.href = "index.html";
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // LOAD CATEGORIES
+        async function loadCategories() {
+            const res = await fetch("http://127.0.0.1:8000/api/categories/", {
+                headers: { Authorization: "Bearer " + token },
+            });
+
+            const cats = await res.json();
+            const tbody = document.getElementById("categoryTableBody");
+            tbody.innerHTML = "";
+
+            cats.forEach((cat) => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${cat.name}</td>
+                        <td><span class="color-box" style="background:${cat.color}"></span></td>
+
+                        <td>
+                            <button class="btn btn-warning btn-sm me-2"
+                                onclick="openEditCategory('${cat.id}', '${cat.name}', '${cat.color}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-danger btn-sm"
+                                onclick="deleteCategory('${cat.id}', '${cat.user_id}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ADD CATEGORY
+        async function addCategory() {
+            const body = {
+                name: document.getElementById("catName").value,
+                color: document.getElementById("catColor").value,
+            };
+
+            await fetch("http://127.0.0.1:8000/api/categories/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify(body),
+            });
+
+            alert("Category Added!");
+            loadCategories();
+        }
+
+        // OPEN EDIT MODAL
+        function openEditCategory(id, name, color) {
+            document.getElementById("editCatId").value = id;
+            document.getElementById("editCatName").value = name;
+            document.getElementById("editCatColor").value = color;
+
+            new bootstrap.Modal(document.getElementById("editCategoryModal")).show();
+        }
+
+        // UPDATE CATEGORY
+        async function updateCategory() {
+            const id = document.getElementById("editCatId").value;
+
+            const body = {
+                name: document.getElementById("editCatName").value,
+                color: document.getElementById("editCatColor").value,
+            };
+
+            await fetch(`http://127.0.0.1:8000/api/categories/${id}/`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token,
+                },
+                body: JSON.stringify(body),
+            });
+
+            alert("Category Updated!");
+            loadCategories();
+        }
+
+        // DELETE CATEGORY
+        async function deleteCategory(id, userId) {
+            if (userId === "null" || userId === null) {
+                alert("Default categories cannot be deleted!");
+                return;
+            }
+
+            if (!confirm("Delete this category?")) return;
+
+            await fetch(`http://127.0.0.1:8000/api/categories/${id}/`, {
+                method: "DELETE",
+                headers: { Authorization: "Bearer " + token },
+            });
+
+            alert("Category Deleted!");
+            loadCategories();
+        }
+
+        loadCategories();
+    </script>
+</body>
+</html>
+

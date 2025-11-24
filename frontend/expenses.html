@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - Expense Tracker</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            background: #f5f7fa;
+            font-family: "Inter", sans-serif;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #fff;
+            padding-top: 30px;
+            position: fixed;
+            box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: 500;
+            color: #444;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover, .active-link {
+            background: #eef2ff;
+            color: #4f46e5 !important;
+            border-radius: 8px;
+        }
+
+        .main {
+            margin-left: 260px;
+            padding: 30px;
+        }
+
+        .badge-category {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .table thead {
+            background: #eef2ff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h4 class="text-center fw-bold mb-4">Expense Tracker</h4>
+
+        <a href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+        <a href="expenses.html" class="active-link"><i class="bi bi-cash-stack me-2"></i> Expenses</a>
+        <a href="categories.html"><i class="bi bi-tags me-2"></i> Categories</a>
+        <a href="budget.html"><i class="bi bi-wallet2 me-2"></i> Budget</a>
+        <a href="analytics.html"><i class="bi bi-bar-chart-line me-2"></i> Analytics</a>
+
+        <hr>
+
+        <a href="#" onclick="logout()"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Expenses</h2>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addExpenseModal">
+                <i class="bi bi-plus-circle me-1"></i> Add Expense
+            </button>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="card p-3 shadow-sm mb-4">
+
+            <div class="row g-3">
+
+                <div class="col-md-4">
+                    <label class="fw-semibold mb-1">Filter by Category</label>
+                    <select id="filterCategory" class="form-select">
+                        <option value="">All Categories</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold mb-1">Start Date</label>
+                    <input type="date" id="filterStart" class="form-control">
+                </div>
+
+                <div class="col-md-4">
+                    <label class="fw-semibold mb-1">End Date</label>
+                    <input type="date" id="filterEnd" class="form-control">
+                </div>
+
+            </div>
+
+            <div class="mt-3">
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+            </div>
+
+        </div>
+
+        <!-- EXPENSE TABLE -->
+        <div class="card p-3 shadow-sm">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Amount (₹)</th>
+                        <th>Date</th>
+                        <th>Note</th>
+                        <th width="150px">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody id="expenseTableBody"></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- ADD EXPENSE MODAL -->
+    <div class="modal fade" id="addExpenseModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Expense</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <label>Category</label>
+                    <select id="expCategory" class="form-select mb-2"></select>
+
+                    <label>Amount</label>
+                    <input id="expAmount" type="number" class="form-control mb-2">
+
+                    <label>Date</label>
+                    <input id="expDate" type="date" class="form-control mb-2">
+
+                    <label>Note</label>
+                    <textarea id="expNote" class="form-control"></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="addExpense()">Save</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT EXPENSE MODAL -->
+    <div class="modal fade" id="editExpenseModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Expense</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="editExpId">
+
+                    <label>Category</label>
+                    <select id="editExpCategory" class="form-select mb-2"></select>
+
+                    <label>Amount</label>
+                    <input id="editExpAmount" type="number" class="form-control mb-2">
+
+                    <label>Date</label>
+                    <input id="editExpDate" type="date" class="form-control mb-2">
+
+                    <label>Note</label>
+                    <textarea id="editExpNote" class="form-control"></textarea>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-success" onclick="updateExpense()">Save Changes</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- PAGE LOGIC -->
+    <script>
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            window.location.href = "index.html";
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = "index.html";
+        }
+
+        // LOAD EXPENSES
+        async function loadExpenses() {
+            const res = await fetch("http://127.0.0.1:8000/api/expenses/", {
+                headers: { Authorization: "Bearer " + token }
+            });
+            const data = await res.json();
+
+            const tbody = document.getElementById("expenseTableBody");
+            tbody.innerHTML = "";
+
+            data.forEach(exp => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td><span class="badge bg-primary badge-category">${exp.category}</span></td>
+                        <td>₹${exp.amount}</td>
+                        <td>${exp.date.split("T")[0]}</td>
+                        <td>${exp.note || "-"}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning me-1"
+                                onclick="openEditModal('${exp.id}', '${exp.category}', ${exp.amount}, '${exp.date.split("T")[0]}', '${exp.note || ""}')">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-sm btn-danger" onclick="deleteExpense('${exp.id}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // LOAD CATEGORIES
+        async function loadCategories() {
+            const res = await fetch("http://127.0.0.1:8000/api/categories/", {
+                headers: { Authorization: "Bearer " + token }
+            });
+
+            const categories = await res.json();
+
+            const addSelect = document.getElementById("expCategory");
+            const editSelect = document.getElementById("editExpCategory");
+            const filterSelect = document.getElementById("filterCategory");
+
+            categories.forEach(cat => {
+                addSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+                editSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+                filterSelect.innerHTML += `<option value="${cat.name}">${cat.name}</option>`;
+            });
+        }
+
+        // ADD EXPENSE
+        async function addExpense() {
+            const body = {
+                category: document.getElementById("expCategory").value,
+                amount: parseFloat(document.getElementById("expAmount").value),
+                date: document.getElementById("expDate").value,
+                note: document.getElementById("expNote").value
+            };
+
+            await fetch("http://127.0.0.1:8000/api/expenses/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify(body)
+            });
+
+            alert("Expense Added!");
+            loadExpenses();
+        }
+
+        // DELETE EXPENSE
+        async function deleteExpense(id) {
+            if (!confirm("Delete this expense?")) return;
+
+            await fetch(`http://127.0.0.1:8000/api/expenses/${id}/`, {
+                method: "DELETE",
+                headers: { Authorization: "Bearer " + token }
+            });
+
+            alert("Expense Deleted!");
+            loadExpenses();
+        }
+
+        // OPEN EDIT MODAL
+        function openEditModal(id, category, amount, date, note) {
+            document.getElementById("editExpId").value = id;
+            document.getElementById("editExpCategory").value = category;
+            document.getElementById("editExpAmount").value = amount;
+            document.getElementById("editExpDate").value = date;
+            document.getElementById("editExpNote").value = note;
+
+            new bootstrap.Modal(document.getElementById("editExpenseModal")).show();
+        }
+
+        // UPDATE EXPENSE
+        async function updateExpense() {
+            const id = document.getElementById("editExpId").value;
+
+            const body = {
+                category: document.getElementById("editExpCategory").value,
+                amount: parseFloat(document.getElementById("editExpAmount").value),
+                date: document.getElementById("editExpDate").value,
+                note: document.getElementById("editExpNote").value
+            };
+
+            await fetch(`http://127.0.0.1:8000/api/expenses/${id}/`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: "Bearer " + token
+                },
+                body: JSON.stringify(body)
+            });
+
+            alert("Expense Updated!");
+            loadExpenses();
+        }
+
+        // FILTERING
+        function applyFilters() {
+            const category = document.getElementById("filterCategory").value;
+            const start = document.getElementById("filterStart").value;
+            const end = document.getElementById("filterEnd").value;
+
+            const rows = document.querySelectorAll("#expenseTableBody tr");
+
+            rows.forEach(row => {
+                const rowCat = row.children[0].innerText.trim();
+                const rowDate = row.children[2].innerText;
+
+                let show = true;
+
+                if (category && rowCat !== category) show = false;
+                if (start && rowDate < start) show = false;
+                if (end && rowDate > end) show = false;
+
+                row.style.display = show ? "" : "none";
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById("filterCategory").value = "";
+            document.getElementById("filterStart").value = "";
+            document.getElementById("filterEnd").value = "";
+            loadExpenses();
+        }
+
+        loadCategories();
+        loadExpenses();
+    </script>
+
+</body>
+</html>

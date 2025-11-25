@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-a9773zd$=bjb58*#os)d(1hxl^fbuje4#ss#@f8*=n07=#+%@w'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -26,17 +26,23 @@ INSTALLED_APPS = [
 
 # ⭐ CORRECT MIDDLEWARE ORDER (fixed!)
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # MUST BE FIRST
+    'django.middleware.security.SecurityMiddleware',
 
-    "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
+    # CORS ALWAYS COMES FIRST (after security)
+    'corsheaders.middleware.CorsMiddleware',
 
-    "django.middleware.common.CommonMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    # CommonMiddleware next
+    'django.middleware.common.CommonMiddleware',
+
+    # Sessions, CSRF, Auth
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # WhiteNoise SHOULD BE LAST
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'expense_tracker.urls'

@@ -1,18 +1,13 @@
-"""
-WSGI config for expense_tracker project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
-"""
-
 import os
-from api.mongo import init_mongo
-
 from django.core.wsgi import get_wsgi_application
 
+# Set settings module
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'expense_tracker.settings')
 
-application = get_wsgi_application()
+# Connect to Mongo BEFORE Django loads
+from api.mongo import init_mongo
 init_mongo()
+
+# Now load Django
+application = get_wsgi_application()
+

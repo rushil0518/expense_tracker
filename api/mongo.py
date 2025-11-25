@@ -2,12 +2,14 @@ import os
 from dotenv import load_dotenv
 from mongoengine import connect
 
-load_dotenv()
-
 def init_mongo():
-    MONGO_URI = os.getenv("MONGO_URI")
+    load_dotenv()
 
-    if MONGO_URI:
-        connect(host=MONGO_URI, alias="default")
-    else:
+    MONGO_URI = os.getenv("MONGO_URI")
+    if not MONGO_URI:
+        print("⚠ No MONGO_URI found in environment — using local DB")
         connect("expense_db", alias="default")
+        return
+
+    print("✔ Connecting to MongoDB Atlas...")
+    connect(host=MONGO_URI, alias="default")

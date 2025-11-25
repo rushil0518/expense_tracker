@@ -110,6 +110,4 @@ CSRF_TRUSTED_ORIGINS = [
 CORS_ALLOW_HEADERS = ["*"]
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 
-# ⭐ Initialize MongoDB (last line)
-from api.mongo import init_mongo
-init_mongo()
+

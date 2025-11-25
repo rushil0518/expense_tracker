@@ -211,9 +211,10 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="config.js"></script>
     <!-- PAGE LOGIC -->
     <script>
+        
         const token = localStorage.getItem("access_token");
 
         if (!token) {
@@ -227,7 +228,7 @@
 
         // LOAD EXPENSES
         async function loadExpenses() {
-            const res = await fetch("http://127.0.0.1:8000/api/expenses/", {
+            const res = await fetch(`${API_BASE}/api/expenses/`, {
                 headers: { Authorization: "Bearer " + token }
             });
             const data = await res.json();
@@ -259,7 +260,7 @@
 
         // LOAD CATEGORIES
         async function loadCategories() {
-            const res = await fetch("http://127.0.0.1:8000/api/categories/", {
+            const res = await fetch(`${API_BASE}/api/categories/`, {
                 headers: { Authorization: "Bearer " + token }
             });
 
@@ -285,7 +286,7 @@
                 note: document.getElementById("expNote").value
             };
 
-            await fetch("http://127.0.0.1:8000/api/expenses/", {
+            await fetch(`${API_BASE}/api/expenses/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -302,7 +303,7 @@
         async function deleteExpense(id) {
             if (!confirm("Delete this expense?")) return;
 
-            await fetch(`http://127.0.0.1:8000/api/expenses/${id}/`, {
+            await fetch(`${API_BASE}/api/expenses/${id}/`, {
                 method: "DELETE",
                 headers: { Authorization: "Bearer " + token }
             });
@@ -333,7 +334,7 @@
                 note: document.getElementById("editExpNote").value
             };
 
-            await fetch(`http://127.0.0.1:8000/api/expenses/${id}/`, {
+            await fetch(`${API_BASE}/api/expenses/${id}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

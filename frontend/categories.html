@@ -166,6 +166,7 @@
 
     <!-- PAGE LOGIC -->
     <script>
+        const API_BASE = "https://expense-tracker-1-5u7k.onrender.com";
         const token = localStorage.getItem("access_token");
         if (!token) window.location.href = "index.html";
 
@@ -176,7 +177,7 @@
 
         // LOAD CATEGORIES
         async function loadCategories() {
-            const res = await fetch("http://127.0.0.1:8000/api/categories/", {
+            const res = await fetch(`${API_BASE}/api/categories/`, {
                 headers: { Authorization: "Bearer " + token },
             });
 
@@ -213,7 +214,7 @@
                 color: document.getElementById("catColor").value,
             };
 
-            await fetch("http://127.0.0.1:8000/api/categories/", {
+            await fetch(`${API_BASE}/api/categories/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -244,7 +245,7 @@
                 color: document.getElementById("editCatColor").value,
             };
 
-            await fetch(`http://127.0.0.1:8000/api/categories/${id}/`, {
+            await fetch(`${API_BASE}/api/categories/${id}/`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -266,7 +267,7 @@
 
             if (!confirm("Delete this category?")) return;
 
-            await fetch(`http://127.0.0.1:8000/api/categories/${id}/`, {
+            await fetch(`${API_BASE}/api/categories/${id}/`, {
                 method: "DELETE",
                 headers: { Authorization: "Bearer " + token },
             });

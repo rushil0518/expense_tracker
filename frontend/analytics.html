@@ -114,9 +114,8 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+  <script src="config.js"></script>
   <script>
-    const API_BASE = "http://127.0.0.1:8000/api/analytics";
     const token = localStorage.getItem("access_token");
     if (!token) location.href = "index.html";
 
@@ -187,28 +186,28 @@
     }
 
     async function loadPie(month){
-      const r = await fetchJson(`${API_BASE}/category-pie/?month=${month}`);
+      const r = await fetchJson(`${API_BASE}/api/analytics/category-pie/?month=${month}`);
       if(!r.ok || !r.data.labels.length){ pieCanvas.classList.add('d-none'); piePl.classList.remove('d-none'); return; }
       piePl.classList.add('d-none'); pieCanvas.classList.remove('d-none');
       drawPie(pieCanvas, r.data.labels, r.data.values, r.data.colors);
     }
 
     async function loadCategory(month){
-      const r = await fetchJson(`${API_BASE}/category-monthly/?month=${month}`);
+      const r = await fetchJson(`${API_BASE}/api/analytics/category-monthly/?month=${month}`);
       if(!r.ok || !r.data.labels.length){ catCanvas.classList.add('d-none'); catPl.classList.remove('d-none'); return; }
       catPl.classList.add('d-none'); catCanvas.classList.remove('d-none');
       drawBar(catCanvas, r.data.labels, r.data.values, r.data.colors);
     }
 
     async function loadTrend(month){
-      const r = await fetchJson(`${API_BASE}/daily-trend/?month=${month}`);
+      const r = await fetchJson(`${API_BASE}/api/analytics/daily-trend/?month=${month}`);
       if(!r.ok || !r.data.labels.length){ trendCanvas.classList.add('d-none'); trendPl.classList.remove('d-none'); return; }
       trendPl.classList.add('d-none'); trendCanvas.classList.remove('d-none');
       drawLine(trendCanvas, r.data.labels, r.data.values);
     }
 
     async function loadMonths(){
-      const r = await fetchJson(`${API_BASE}/monthly-bar/`);
+      const r = await fetchJson(`${API_BASE}/api/analytics/monthly-bar/`);
       if(!r.ok || !r.data.labels.length){ monthsCanvas.classList.add('d-none'); monthsPl.classList.remove('d-none'); return; }
       monthsPl.classList.add('d-none'); monthsCanvas.classList.remove('d-none');
       drawMonths(monthsCanvas, r.data.labels, r.data.values);

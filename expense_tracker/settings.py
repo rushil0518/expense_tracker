@@ -45,18 +45,24 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+
+    # WhiteNoise after Security (Render needs this order)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    # CORS must be BEFORE CommonMiddleware
+    'corsheaders.middleware.CorsMiddleware',
+
+    # Common middleware only once
     'django.middleware.common.CommonMiddleware',
+
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
 ]
+
 
 ROOT_URLCONF = 'expense_tracker.urls'
 
@@ -146,6 +152,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.onrender.com",
+    "https://*.netlify.app",
+]
 
 CORS_ALLOW_HEADERS = [
     '*',

@@ -49,13 +49,15 @@
             </div>
         </div>
     </div>
+    <script src="config.js"></script>
 
     <script>
+        
         document.getElementById("loginBtn").addEventListener("click", async function () {
             const username = document.getElementById("username").value.trim();
             const password = document.getElementById("password").value.trim();
 
-            const response = await fetch("http://127.0.0.1:8000/api/token/", {
+            const response = await fetch(`${API_BASE}/api/token/`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({username, password})

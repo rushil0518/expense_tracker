@@ -6,7 +6,7 @@ class ApiConfig(AppConfig):
     name = 'api'
 
     def ready(self):
-        import api.mongo
+        
         # Avoid circular imports by importing inside method
         from .utils import preload_default_categories
         

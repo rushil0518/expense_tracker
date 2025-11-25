@@ -4,11 +4,10 @@ from mongoengine import connect
 
 load_dotenv()
 
-MONGO_URI = os.getenv("MONGO_URI")
+def init_mongo():
+    MONGO_URI = os.getenv("MONGO_URI")
 
-if MONGO_URI :
-    connect(host = MONGO_URI)
-
-else :
-    connect("expense_db")
- 
+    if MONGO_URI:
+        connect(host=MONGO_URI, alias="default")
+    else:
+        connect("expense_db", alias="default")

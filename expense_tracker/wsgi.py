@@ -1,11 +1,13 @@
 import os
 from django.core.wsgi import get_wsgi_application
 
-# Set settings module
+# MongoDB init
+from api.mongo import init_mongo
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'expense_tracker.settings')
 
-
-
-# Now load Django
+# Load Django
 application = get_wsgi_application()
 
+# Initialize MongoDB AFTER Django loads
+init_mongo()

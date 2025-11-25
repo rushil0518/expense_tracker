@@ -10,11 +10,12 @@ class ApiConfig(AppConfig):
         # Delayed preload so DB is ready
         def delayed_preload():
             time.sleep(5)  # wait for Mongo to fully connect
-            try:
-                from .utils import preload_default_categories
-                preload_default_categories()
-                print("✔ Default categories preloaded")
-            except Exception as e:
-                print("⚠ Could not preload categories:", e)
+            # try:
+            #     from .utils import preload_default_categories
+            #     preload_default_categories()
+            #     print("✔ Default categories preloaded")
+            # except Exception as e:
+            #     print("⚠ Could not preload categories:", e)
+            pass
 
         threading.Thread(target=delayed_preload).start()

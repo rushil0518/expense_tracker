@@ -174,3 +174,6 @@ CORS_ALLOW_METHODS = [
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+from api.mongo import init_mongo
+init_mongo()
